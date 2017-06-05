@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,10 +28,21 @@ namespace Balance
       
       private void Button_Click(object sender, RoutedEventArgs e)
       {
-         TextBlock counterScreen = FindName("Varung") as TextBlock;
-         counterScreen.Text = (++m_count).ToString();
+         TextBlock screen = FindName("Varung") as TextBlock;
+         
+         var html = @"http://rate.am/";
+         HtmlWeb web = new HtmlWeb();
+         var htmlDoc = web.Load(html);
+         try
+         {
+            var node = htmlDoc.DocumentNode.SelectSingleNode("//img[@alt='HSBC Bank Armenia']");
+            
+            screen.Text = "Node Name: " + node.NextSibling.OuterHtml;
+         }
+         catch( Exception ex )
+         {
+            screen.Text = ex.Source + " " + ex.Message;
+         }
       }
-      
-      private int m_count = 0;
    }
 }
