@@ -24,25 +24,27 @@ namespace Balance
       public MainWindow()
       {
          InitializeComponent();
+
+         web = new HtmlWeb();
+         var hsbcInfo = web.Load(baseURL + hsbcPostfix);
+
+         hsbcID = hsbcInfo.DocumentNode.SelectSingleNode("//option[@selected='selected']").Attributes["value"].Value;
       }
       
       private void Button_Click(object sender, RoutedEventArgs e)
       {
          TextBlock screen = FindName("Varung") as TextBlock;
          
-         var html = @"http://rate.am/";
-         HtmlWeb web = new HtmlWeb();
-         var htmlDoc = web.Load(html);
-         try
-         {
-            var node = htmlDoc.DocumentNode.SelectSingleNode("//img[@alt='HSBC Bank Armenia']");
-            
-            screen.Text = "Node Name: " + node.NextSibling.OuterHtml;
-         }
-         catch( Exception ex )
-         {
-            screen.Text = ex.Source + " " + ex.Message;
-         }
+         var ratesInfo = web.Load(baseURL).DocumentNode.SelectSingleNode("//tr[@id='" + hsbcID + "']");
+         var date = ratesInfo.ChildNodes[9].InnerText;
+         var dollarRate = ratesInfo.ChildNodes[11].InnerText;
+
+         screen.Text = date + "\n$1 = " + dollarRate + "դր";
       }
+
+      private HtmlWeb web;
+      private const string baseURL     = @"http://rate.am/";
+      private const string hsbcPostfix = @"am/bank/hsbc-bank-armenia/";
+      private string hsbcID;
    }
 }
