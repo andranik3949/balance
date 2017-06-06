@@ -5,11 +5,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Balance"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-   <Grid>
-      <TextBlock Name="Varung" Margin="10"/>
-      <Button Click="Button_Click" Margin="10,251,10,10">
-         Click me!
-      </Button>
-   </Grid>
+        Title="MainWindow" Height="356" Width="525">
+   <Border Padding="10">
+      <StackPanel Height="300">
+         <Grid Height="250">
+            <Grid.ColumnDefinitions>
+               <ColumnDefinition Width="1.5*"/>
+               <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock x:Name="DataScreen" Grid.Column="0"/>
+            <StackPanel Grid.Column="1">
+               <Calendar x:Name="CalendarScreen" FirstDayOfWeek="Monday"/>
+               <Button MouseLeftButtonDown="Button_MouseLeftButtonDown" Click="Button_Click" Width="179" Height="25" Content="Update"/>
+            </StackPanel>
+         </Grid>
+         <TextBlock x:Name="StatusBar" Text="Varung"/>
+      </StackPanel>
+   </Border>
 </Window>
