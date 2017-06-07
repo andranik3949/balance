@@ -53,35 +53,44 @@ namespace Balance
       private const string baseURL = @"http://rate.am/";
       private const string hsbcPostfix = @"am/bank/hsbc-bank-armenia/";
 
-      public Rates(DateTime? date)
+      public Rates()
+      {
+         Init();
+      }
+
+      public Rates(DateTime date)
+      {
+         Init();
+         fetch(date);
+      }
+
+      private void Init()
       {
          HtmlWeb web = new HtmlWeb();
          hsbcId = web.Load(baseURL + hsbcPostfix).DocumentNode.SelectSingleNode("//option[@selected='selected']").Attributes["value"].Value;
-
-         fetch(date);
       }
 
-      public void reload(DateTime? date)
+      public void reload(DateTime date)
       {
          fetch(date);
       }
 
-      private string generateDateUrlPostfix(DateTime? date)
-      {
-         if (date.Equals(null))
-            return "";
-
-         const string datePostfix = "am/armenian-dram-exchange-rates/banks/cash/";
-         DateTime current = (DateTime)date;
-         return datePostfix + current.ToString("yyyy/MM/dd") + "/18-30";
-      }
-
-      private void fetch(DateTime? date)
+      private void fetch(DateTime date)
       {
          HtmlWeb web = new HtmlWeb();
          HtmlNode ratesInfo = web.Load(baseURL + generateDateUrlPostfix(date)).DocumentNode.SelectSingleNode("//tr[@id='" + hsbcId + "']");
 
          rate.setFromHtml(ratesInfo);
+      }
+
+      private string generateDateUrlPostfix(DateTime date)
+      {
+         DateTime now = DateTime.Now;
+         if (now - date < TimeSpan.FromMinutes(15) )
+            return "";
+
+         const string datePostfix = "am/armenian-dram-exchange-rates/banks/cash/";
+         return datePostfix + date.ToString("yyyy/MM/dd/HH-mm");
       }
 
       public Rate getRates() { return rate; }
@@ -98,25 +107,34 @@ namespace Balance
       public MainWindow()
       {
          InitializeComponent();
-         hsbcRates = new Rates(CalendarScreen.SelectedDate);
-         DisplayRates();
+         hsbcRates = new Rates();
+
+         StatusBar.Text = "Ready";
       }
 
       private void Button_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
       {
-         StatusBar.Text = "Updating...";
+         StatusBar.Text = "Loading rates...";
       }
 
       private void Button_Click(object sender, RoutedEventArgs e)
       {
-         hsbcRates.reload(CalendarScreen.SelectedDate);
+         if (CalendarScreen.SelectedDate == null)
+         {
+            StatusBar.Text = "Error: No date selected";
+            return;
+         }
+
+         DateTime requestedDate = (DateTime)CalendarScreen.SelectedDate;
+         hsbcRates.reload(requestedDate.AddHours(7 + ((int)TimeSlider.Value / 4) - requestedDate.Hour).AddMinutes(15 * ((int)TimeSlider.Value % 4) - requestedDate.Minute));
          DisplayRates();
 
-         StatusBar.Text = "";
+         StatusBar.Text = "Ready";
       }
 
       private void DisplayRates()
       {
+         DateField.Text = hsbcRates.getRates().timestamp;
          BuyUSD.Text = string.Format("{0:F2}", hsbcRates.getRates().buyUSD);
          SellUSD.Text = string.Format("{0:F2}", hsbcRates.getRates().sellUSD);
          BuyRUR.Text = string.Format("{0:F2}", hsbcRates.getRates().buyRUR);
@@ -124,5 +142,37 @@ namespace Balance
       }
 
       private Rates hsbcRates;
+
+      private void CalendarScreen_GotMouseCapture(object sender, MouseEventArgs e)
+      {
+         Mouse.Capture(null);
+      }
+
+      private void CavasScreen_MouseDown(object sender, MouseButtonEventArgs e)
+      {
+         canvasStart = e.GetPosition((Canvas)sender);
+      }
+
+      private void CavasScreen_MouseUp(object sender, MouseButtonEventArgs e)
+      {
+         Canvas c = (Canvas)sender;
+
+         Line l = new Line();
+         l.StrokeThickness = 1;
+         l.Stroke = System.Windows.Media.Brushes.Black;
+         l.X1 = canvasStart.X;
+         l.Y1 = canvasStart.Y;
+         l.X2 = e.GetPosition(c).X;
+         l.Y2 = e.GetPosition(c).Y;
+         (c).Children.Add(l);
+      }
+
+      private Point canvasStart;
+
+      private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+      {
+         int selection = (int)((Slider)sender).Value;
+         SelectedTime.Text = string.Format("{0:D2}:{1:D2}", 7 + (selection / 4), 15 * (selection % 4));
+      }
    }
 }

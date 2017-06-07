@@ -1,17 +1,31 @@
-﻿<Window x:Class="Balance.MainWindow"
+﻿<Window x:Class="Balance.MainWindow" x:Name="Window"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Balance"
         mc:Ignorable="d"
-        Title="MainWindow" Height="356" Width="525" >
+        Title="Balance" Height="500" Width="700" >
    <DockPanel Margin="0,10,0,0" LastChildFill="true">
-      <TextBlock Name="StatusBar" Padding="7,3,0,0" DockPanel.Dock="Bottom" Height="20" Background="#eee" FontFamily="Consolas"/>
-      <StackPanel DockPanel.Dock="Right" Margin="0,0,10,0" Width="180">
-         <Calendar Name="CalendarScreen" FirstDayOfWeek="Monday"/>
-         <Button PreviewMouseDown="Button_MouseLeftButtonDown" Click="Button_Click" Height="25" Content="Update"/>
-         <Grid Height="75" Margin="9.5,5,9.5,0">
+      
+      <!--Status Bar-->
+      <TextBlock x:Name="StatusBar" Padding="7,3,0,0" DockPanel.Dock="Bottom" Height="20" Background="#eee" FontFamily="Consolas"/>
+      
+      <!--Calendar and Rates-->
+      <StackPanel DockPanel.Dock="Right" Margin="0,0,10,5" Width="180">
+         <Calendar x:Name="CalendarScreen" GotMouseCapture="CalendarScreen_GotMouseCapture" xml:lang="hy-AM" FirstDayOfWeek="Monday"/>
+         
+         <!--Time-->
+         <DockPanel Margin="0,0,0,5" LastChildFill="true">
+            <TextBlock x:Name="SelectedTime" DockPanel.Dock="Left" Text="07:00" VerticalAlignment="Center" Margin="6,0,0,0" Width="40"/>
+            <Slider x:Name="TimeSlider" ValueChanged="Slider_ValueChanged" Minimum="0" Maximum="55"/>
+         </DockPanel>
+
+         <Button PreviewMouseDown="Button_MouseLeftButtonDown" Click="Button_Click" Margin="0,0,0,5" Height="25" Content="Load"/>
+         
+         <!--Rates-->
+         <TextBlock x:Name="DateField" FontWeight="Bold" Margin="6,0,6,5"/>
+         <Grid Height="75">
             <Grid.RowDefinitions>
                <RowDefinition Height="*"/>
                <RowDefinition Height="*"/>
@@ -23,8 +37,8 @@
                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="1" HorizontalAlignment="Center" Text="Buy"/>
-            <TextBlock Grid.Column="2" HorizontalAlignment="Center" Text="Sell"/>
+            <TextBlock Grid.Column="1" HorizontalAlignment="Center" Text="Առք"/>
+            <TextBlock Grid.Column="2" HorizontalAlignment="Center" Text="Վաճառք"/>
             <TextBlock Grid.Row="1" HorizontalAlignment="Center" Text="USD"/>
             <TextBlock Grid.Row="2" HorizontalAlignment="Center" Text="RUR"/>
             <TextBlock Name="BuyUSD" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center"/>
@@ -33,6 +47,8 @@
             <TextBlock Name="SellRUR" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Center"/>
          </Grid>
       </StackPanel>
-      <TextBlock Name="DataScreen" Margin="10,0,5,5"/>
+      
+      <!--Data Display-->
+      <Canvas x:Name="CavasScreen" MouseDown="CavasScreen_MouseDown" MouseUp="CavasScreen_MouseUp" Background="Transparent" Margin="10,0,5,5"/>
    </DockPanel>
 </Window>
