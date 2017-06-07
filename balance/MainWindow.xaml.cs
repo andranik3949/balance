@@ -99,6 +99,7 @@ namespace Balance
       {
          InitializeComponent();
          hsbcRates = new Rates(CalendarScreen.SelectedDate);
+         DisplayRates();
       }
 
       private void Button_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -109,13 +110,17 @@ namespace Balance
       private void Button_Click(object sender, RoutedEventArgs e)
       {
          hsbcRates.reload(CalendarScreen.SelectedDate);
-         DataScreen.Text = hsbcRates.getRates().timestamp +
-            "\nBuy USD: " + string.Format("{0:F2}", hsbcRates.getRates().buyUSD) +
-            "\nSell USD: " + string.Format("{0:F2}", hsbcRates.getRates().sellUSD) +
-            "\nBuy RUR: " + string.Format("{0:F2}", hsbcRates.getRates().buyRUR) +
-            "\nSell RUR: " + string.Format("{0:F2}", hsbcRates.getRates().sellRUR);
+         DisplayRates();
 
          StatusBar.Text = "";
+      }
+
+      private void DisplayRates()
+      {
+         BuyUSD.Text = string.Format("{0:F2}", hsbcRates.getRates().buyUSD);
+         SellUSD.Text = string.Format("{0:F2}", hsbcRates.getRates().sellUSD);
+         BuyRUR.Text = string.Format("{0:F2}", hsbcRates.getRates().buyRUR);
+         SellRUR.Text = string.Format("{0:F2}", hsbcRates.getRates().sellRUR);
       }
 
       private Rates hsbcRates;
